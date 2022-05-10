@@ -3,6 +3,7 @@ package com.indraInterview;
 import com.indraInterview.commandclasses.CommandExecutor;
 import com.indraInterview.commandclasses.CommandIssuer;
 import com.indraInterview.commandclasses.RandomCommandIssuer;
+import com.indraInterview.db.DBHandler;
 import com.indraInterview.utils.Utils;
 
 import java.io.IOException;
@@ -10,10 +11,28 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+//        demonstrate();
+        demonstrate2();
+    }
+
+    private static void demonstrate() {
+        DBHandler dbHandler = new DBHandler();
+        dbHandler.deleteAll();
+
+        CommandExecutor executor = new CommandExecutor(1);
+        new Thread(executor).start();
+        CommandIssuer issuer = new CommandIssuer();
+        new Thread(issuer).start();
+    }
+
+    private static void demonstrate2() {
+        DBHandler dbHandler = new DBHandler();
+        dbHandler.deleteAll();
+
         //Utils.setIsDBHandlerPrinting(true);
         Utils.setIsQueuePrinting(true);
-        Utils.setIsExecutorPrinting(true);
-        Utils.setSleepTime(500);
+        //Utils.setIsExecutorPrinting(true);
+        Utils.setSleepTime(200);
 
         CommandExecutor executor1 = new CommandExecutor(1);
         CommandExecutor executor2 = new CommandExecutor(2);
@@ -25,9 +44,6 @@ public class Main {
         new Thread(executor3).start();
         new Thread(executor4).start();
         new Thread(executor5).start();
-
-//        CommandIssuer issuer = new CommandIssuer();
-//        new Thread(issuer).start();
 
         RandomCommandIssuer randomIssuer1 = new RandomCommandIssuer(1);
         RandomCommandIssuer randomIssuer2 = new RandomCommandIssuer(2);

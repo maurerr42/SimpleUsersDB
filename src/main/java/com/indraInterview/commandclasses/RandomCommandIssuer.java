@@ -27,7 +27,7 @@ public class RandomCommandIssuer implements Runnable {
     public void run() {
         while (true) {
             double randomNumber = Math.random() * 10;
-            double lowerDecider = 8;
+            double lowerDecider = 7;
             double upperDecider = 9;
             if (lowerDecider > randomNumber) {
                 addCommand(new Command("Add", Utils.userId++, getRandomUserGuid(), "Robert"));
