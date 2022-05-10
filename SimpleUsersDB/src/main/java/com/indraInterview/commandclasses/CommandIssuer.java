@@ -6,7 +6,7 @@ public class CommandIssuer implements Runnable {
 
     private void addCommand(Command command) {
 //      CommandQueueBlocking.addCommand(command);
-        CommandQueueWithLocks.addCommand(command);
+        CommandQueueWithLocks.addCommand(command, -1);
     }
 
     private void runCommands() {

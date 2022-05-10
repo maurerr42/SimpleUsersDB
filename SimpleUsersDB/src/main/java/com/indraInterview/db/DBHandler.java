@@ -14,7 +14,7 @@ public class DBHandler {
 
     private void connect() throws SQLException, ClassNotFoundException {
         Class.forName(JDBC_DRIVER);
-        Utils.printSystemMessage("Connecting to database...");
+        Utils.printDBHandlerMessage("Connecting to database...");
         conn = DriverManager.getConnection(DB_URL,"","");
     }
 
@@ -23,17 +23,19 @@ public class DBHandler {
         conn.close();
     }
 
-    private void execute(String query) {
+    private String execute(String query) {
+        String result = "";
+
         try {
             connect();
-            Utils.printSystemMessage("Executing query");
+            Utils.printDBHandlerMessage("Executing query");
             stmt = conn.createStatement();
             if (query.toLowerCase().contains("select")) {
-                doSelectQuery(query);
+                result = doSelectQuery(query);
             } else {
                 doQuery(query);
             }
-            Utils.printSystemMessage("Query executed");
+            Utils.printDBHandlerMessage("Query executed");
             disconnect();
         } catch(Exception e) {
             e.printStackTrace();
@@ -45,33 +47,45 @@ public class DBHandler {
                 se.printStackTrace();
             }
         }
-        Utils.printSystemMessage("Execute method end");
+        Utils.printDBHandlerMessage("Execute method end");
+
+        return result;
     }
 
-    private void doSelectQuery(String query) throws SQLException {
-        printOutSelectResults(stmt.executeQuery(query));
+    private void doQuery(String query) throws SQLException {
+        stmt.executeUpdate(query);
     }
 
-    private void printOutSelectResults(ResultSet resultSet) {
+    private String doSelectQuery(String query) throws SQLException {
+        return selectResultsToString(stmt.executeQuery(query));
+    }
+
+    private String selectResultsToString(ResultSet resultSet) {
+        StringBuilder resultBuilder = new StringBuilder();
+
         try {
             Boolean rowsNotFound = true;
             while (resultSet.next()) {
                 if (rowsNotFound) rowsNotFound = false;
 
-                System.out.print("USER_ID: " + resultSet.getInt("USER_ID"));
-                System.out.print(", USER_GUID: " + resultSet.getString("USER_GUID"));
-                System.out.println(", USER_NAME: " + resultSet.getString("USER_NAME"));
+                resultBuilder.append("USER_ID: ");
+                resultBuilder.append(resultSet.getInt("USER_ID"));
+                resultBuilder.append(", USER_GUID: ");
+                resultBuilder.append(resultSet.getString("USER_GUID"));
+                resultBuilder.append(", USER_NAME: ");
+                resultBuilder.append(resultSet.getString("USER_NAME"));
+                if (!resultSet.isLast()) {
+                    resultBuilder.append("\n");
+                }
             }
             if (rowsNotFound) {
-                System.out.println("Zero rows found");
+                resultBuilder.append("Zero rows found");
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-    }
 
-    private void doQuery(String query) throws SQLException {
-        stmt.executeUpdate(query);
+        return resultBuilder.toString();
     }
 
     /**
@@ -95,8 +109,8 @@ public class DBHandler {
                 "VALUES (" + userId + ", '" + userGuid + "', '" + userName + "');");
     }
 
-    public void printAll() {
-        execute("SELECT * FROM SUSERS;");
+    public String printAll() {
+        return execute("SELECT * FROM SUSERS;");
     }
 
     public void deleteAll() {
